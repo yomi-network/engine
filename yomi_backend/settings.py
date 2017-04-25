@@ -25,7 +25,7 @@ SECRET_KEY = 'm-cyg(zzf=n3hp@k86y2td)hevb=^p)@(yyk@zw^2v(wf^pp*o'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['yomi.herokuapp.com']
 
 
 # Application definition
