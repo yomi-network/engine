@@ -8,10 +8,12 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         model = User
         fields = ('url', 'username', 'email', 'groups')
 
+
 class GroupSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Group
         fields = ('url', 'name')
+
 
 class PolymorphicHyperlinkedIdentityField(serializers.HyperlinkedRelatedField):
     def __init__(self, view_name=None, **kwargs):
@@ -21,8 +23,6 @@ class PolymorphicHyperlinkedIdentityField(serializers.HyperlinkedRelatedField):
         super(PolymorphicHyperlinkedIdentityField, self).__init__(view_name, **kwargs)
 
     def use_pk_only_optimization(self):
-        # We have the complete object instance already. We don't need
-        # to run the 'only get the pk for this relationship' code.
         return False
 
 
@@ -36,23 +36,32 @@ class PolymorphicHyperlinkedIdentityField(serializers.HyperlinkedRelatedField):
 
         return self.reverse("{}-detail".format(obj.kind), kwargs=kwargs, request=request, format=format)
 
+
 class PostSerializer(serializers.HyperlinkedModelSerializer):
     url = PolymorphicHyperlinkedIdentityField(view_name='recipe-detail' )
+    owner = serializers.ReadOnlyField(source='my_lord.username')
 
     class Meta:
         model = Post
-        fields = ('url', 'title', 'description', 'images', 'updated_at', 'kind')
+        fields = ('url', 'title', 'description', 'images', 'updated_at', 'kind', 'owner')
         read_only_fields = ('title', 'description', 'images', 'updated_at', 'kind')
 
+
 class RecipeSerializer(serializers.HyperlinkedModelSerializer):
+    owner = serializers.ReadOnlyField(source='owner.username')
+
     class Meta:
+        owner = serializers.ReadOnlyField(source='owner.username')
         model = Recipe
         fields = ('title', 'description', 'ingredients', 'steps',
-                  'images', 'portions', 'cost')
+                  'images', 'portions', 'cost', 'owner')
 
 
 class MenuSerializer(serializers.HyperlinkedModelSerializer):
+    owner = serializers.ReadOnlyField(source='owner.username')
+
     class Meta:
         model = Menu
+        owner = serializers.ReadOnlyField(source='owner.username')
         fields = ('title', 'description', 'images', 'collaborative',
-                  'entries')
+                  'entries', 'owner')

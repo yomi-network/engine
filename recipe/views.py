@@ -3,13 +3,14 @@ from django.http import HttpResponse, JsonResponse
 from django.views import View
 from django.core import  serializers
 from django.contrib.auth.models import User, Group
-from rest_framework import viewsets
+from rest_framework import viewsets, permissions
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 # Create your views here.
 from recipe.models import Recipe, Menu, Post
 from recipe.serializers import (UserSerializer, GroupSerializer,
                                 RecipeSerializer, MenuSerializer, PostSerializer)
+from recipe.permissions import IsOwnerOrReadOnly
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -34,9 +35,18 @@ def index(request):
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly,)
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
 
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
 class MenuViewSet(viewsets.ModelViewSet):
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly,)
     queryset = Menu.objects.all()
     serializer_class = MenuSerializer
+
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
