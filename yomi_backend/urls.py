@@ -26,6 +26,15 @@ router.register(r'menus', views.MenuViewSet)
 
 urlpatterns = [
     url(r'^timeline/', views.index),
+
+    url(r'me/recipes', views.MeRecipes.as_view()),
+    url(r'me/menus', views.MeMenus.as_view()),
+
+    url(r'^users/@(?P<username>.+)/recipes/$', views.UserRecipes.as_view()),
+    url(r'^users/@(?P<username>.+)/menus/$', views.UserMenus.as_view()),
+    url(r'^users/@(?P<username>.+)/$', views.UsernameView.as_view()),
+
+
     url(r'^', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^admin/', admin.site.urls),
